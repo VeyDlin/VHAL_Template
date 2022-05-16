@@ -6,4 +6,6 @@
 
 
 
-
+void USART1_IRQHandler() {
+	BSP::consoleSerial.IrqHandler();
+}
