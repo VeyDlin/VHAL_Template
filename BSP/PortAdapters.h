@@ -1,9 +1,7 @@
 #pragma once
-//#include <Adapter/Port/G4/GPIOAdapterG4.h>
-//#include <Adapter/Port/G4/UARTAdapterG4.h>
-//#include <Adapter/Port/G4/DACAdapterG4.h>
-//#include <Adapter/Port/G4/IWDGAdapterG4.h>
-//#include <Adapter/Port/G4/ADCAdapterG4.h>
+#include <Adapter/Port/F4/GPIOAdapterF4.h>
+#include <Adapter/Port/F4/UARTAdapterF4.h>
+#include <Adapter/Port/F4/IWDGAdapterF4.h>
 
 
 

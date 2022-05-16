@@ -5,8 +5,10 @@
 
 class BSP {
 public:
-
-
+	static AUART consoleSerial;
+	static AIWDG mcuWathDog;
+	static AGPIO ledPin;
+	static AGPIO ledErrorPin;
 
 
 public:
