@@ -13,7 +13,7 @@ MainTask Application::main;
 void Application::Init() {
 	InitSystemHandle();
 
-	RTOS::CreateThread(mcuWatchDog, ThreadPriority::realtime);
+	RTOS::CreateThread(main);
 
 	if(useWatchDog) {
 		RTOS::CreateThread(mcuWatchDog, ThreadPriority::realtime);
