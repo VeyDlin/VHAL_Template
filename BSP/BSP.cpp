@@ -2,16 +2,25 @@
 
 
 AUART BSP::consoleSerial	= { USART1 };
-AIWDG BSP::mcuWathDog 		= { IWDG, 32000 };
-AGPIO BSP::ledPin 			= { GPIOC, 6, true }; // inversion logic = true (OpenDrain)
+AIWDG BSP::mcuWathDog		= { IWDG, 32000 };
+AGPIO BSP::ledPin			= { GPIOC, 6, true }; // inversion logic = true (OpenDrain)
 AGPIO BSP::ledErrorPin		= { GPIOC, 7, true }; // inversion logic = true (OpenDrain)
 
 
 
 void BSP::InitSystem() {
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
 	LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+
+	/* System interrupt init*/
 	NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+	/* PendSV_IRQn interrupt configuration */
+	NVIC_SetPriority(PendSV_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
+
+	/* SysTick_IRQn interrupt configuration */
+	NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
 }
 
 
@@ -19,39 +28,33 @@ void BSP::InitSystem() {
 
 
 void BSP::InitClock() {
-	LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
-	while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2) {
-	}
+	LL_FLASH_SetLatency(LL_FLASH_LATENCY_3);
+	while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_3) {}
 	LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
-	LL_RCC_HSE_Enable();
+	LL_RCC_HSI_SetCalibTrimming(16);
+	LL_RCC_HSI_Enable();
 
-	/* Wait till HSE is ready */
-	while (LL_RCC_HSE_IsReady() != 1) {
-	}
+	/* Wait till HSI is ready */
+	while (LL_RCC_HSI_IsReady() != 1) {}
 	LL_RCC_LSI_Enable();
 
 	/* Wait till LSI is ready */
-	while (LL_RCC_LSI_IsReady() != 1) {
-
-	}
-	LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_8, 72, LL_RCC_PLLP_DIV_2);
-	LL_RCC_PLL_ConfigDomain_48M(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_8, 72, LL_RCC_PLLQ_DIV_3);
+	while (LL_RCC_LSI_IsReady() != 1) {}
+	LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_8, 100, LL_RCC_PLLP_DIV_2);
 	LL_RCC_PLL_Enable();
 
 	/* Wait till PLL is ready */
-	while (LL_RCC_PLL_IsReady() != 1) {
-	}
+	while (LL_RCC_PLL_IsReady() != 1) {}
 	LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
 	LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_2);
 	LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
 	LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
 
 	/* Wait till System clock is ready */
-	while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {
-	}
-	LL_SetSystemCoreClock(72000000);
-
-	LL_RCC_SetUSBClockSource(LL_RCC_USB_CLKSOURCE_PLL);
+	while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL) {}
+	// Use BSP::InitSystemTick()
+	// LL_Init1msTick(100000000);  
+	LL_SetSystemCoreClock(100000000);
 	LL_RCC_SetTIMPrescaler(LL_RCC_TIM_PRESCALER_TWICE);
 }
 
